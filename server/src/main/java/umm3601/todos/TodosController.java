@@ -1,4 +1,4 @@
-package umm3601.user;
+package umm3601.todos;
 
 import java.io.IOException;
 
@@ -10,17 +10,17 @@ import umm3601.Controller;
 
 public class TodosController implements Controller {
 
-    private TodosDatabase userDatabase;
+    private TodosDatabase todosDatabase;
      /**
         @param database the `Database` containing user data
      */
     public TodosController(TodosDatabase todosDatabase) {
         this.todosDatabase = todosDatabase;
     }
-
-        @throwsIOException
-
-    public static TodosController buildTodosController(String userDataFile) throws IOException {
+    /**
+        @throws IOException
+    */
+    public static TodosController buildTodosController(String todosDataFile) throws IOException {
         TodosController todosController = null;
 
         TodosDatabase todosDatabase = new TodosDatabase(todosDataFile);
@@ -31,9 +31,9 @@ public class TodosController implements Controller {
       /**
         @param ctx a Javalin HTTP context
       */
-    public void getTodos(Context ctx) {
+    public void getTodo(Context ctx) {
         String id = ctx.pathParam("id");
-        Todos todos = todosDatabase.getTodos(id);
+        Todos todos = todosDatabase.getTodo(id);
         if (todos != null) {
             ctx.json(todos);
             ctx.status(HttpStatus.OK);
@@ -46,7 +46,7 @@ public class TodosController implements Controller {
         @param ctx a Javalin HTTP context
       */
     public void getTodos(Context ctx) {
-        Todo[] todos = todosDatabase.listTodos(ctx.queryParamMap());
+        Todos[] todos = todosDatabase.listTodos(ctx.queryParamMap());
         ctx.json(todos);
     }
       /**
