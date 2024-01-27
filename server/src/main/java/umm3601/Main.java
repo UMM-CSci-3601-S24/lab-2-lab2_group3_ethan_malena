@@ -2,10 +2,12 @@ package umm3601;
 
 import java.io.IOException;
 
+import umm3601.todos.TodosController;
 import umm3601.user.UserController;
 
 public class Main {
   public static final String USER_DATA_FILE = "/users.json";
+  public static final String TODOS_DATA_FILE = "/todos.json";
 
   public static void main(String[] args) throws IOException {
 
@@ -38,7 +40,9 @@ public class Main {
       // the `Controller` interface.
       UserController.buildUserController(USER_DATA_FILE)
     };
+      TodosController.buildTodosController(TODOS_DATA_FILE);
     return controllers;
   }
+
 
 }

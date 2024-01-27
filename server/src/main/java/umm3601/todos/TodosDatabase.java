@@ -9,7 +9,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.javalin.http.BadRequestResponse;
+//import io.javalin.http.BadRequestResponse;
 
 public class TodosDatabase {
 
@@ -44,41 +44,22 @@ public class TodosDatabase {
   public Todos[] listTodos(Map<String, List<String>> queryParams) {
     Todos[] filteredTodos = allTodos;
 
-    if (queryParams.containsKey("age")) {
-      String ageParam = queryParams.get("age").get(0);
-      try {
-        int targetAge = Integer.parseInt(ageParam);
-        filteredTodos = filterTodosByAge(filteredTodos, targetAge);
-      } catch (NumberFormatException e) {
-        throw new BadRequestResponse("Specified age " + ageParam + "' can't be parsed to an integer");
-      }
-    }
-    if (queryParams.containsKey("company")) {
-      String targetCompany = queryParams.get("company").get(0);
-      filteredTodos = filterTodosByCompany(filteredTodos, targetCompany);
+    if (queryParams.containsKey("owner")) {
+      String targetOwner = queryParams.get("owner").get(0);
+      filteredTodos = filterTodosByOwner(filteredTodos, targetOwner);
     }
 
     return filteredTodos;
   }
 
   /**
-   * @param todos     the list of users to filter by age
-   * @param targetAge the target age to look for
-   * @return an array of all the users from the given list that have the target
-   *         age
-   */
-  public Todos[] filterTodosByAge(Todos[] todos, int targetAge) {
-    return Arrays.stream(todos).filter(x -> x.age == targetAge).toArray(Todos[]::new);
-  }
-
-  /**
    * @param todos         the list of users to filer by company
-   * @param targetCompany the target company to look for
+   * @param targetOwner the target company to look for
    * @return an array of all the users from the given list that have the target
    *         company
    */
-  public Todos[] filterTodosByCompany(Todos[] todos, String targetCompany) {
-    return Arrays.stream(todos).filter(x -> x.company.equals(targetCompany)).toArray(Todos[]::new);
+  public Todos[] filterTodosByOwner(Todos[] todos, String targetOwner) {
+    return Arrays.stream(todos).filter(x -> x.owner.equals(targetOwner)).toArray(Todos[]::new);
   }
 
 }
