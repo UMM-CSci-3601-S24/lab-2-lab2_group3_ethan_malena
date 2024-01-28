@@ -24,6 +24,7 @@ import org.mockito.MockitoAnnotations;
 import io.javalin.Javalin;
 //import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
+import io.javalin.http.HttpStatus;
 import io.javalin.http.NotFoundResponse;
 //import io.javalin.http.HttpStatus;
 //import io.javalin.http.NotFoundResponse;
@@ -91,4 +92,14 @@ public class TodoControllerSpec {
     assertEquals("No todos with id " + null + " was found.", exception.getMessage());
   }
 
+  @Test
+  public void canGetTodoWithSpecifiedId() throws IOException {
+    String id = "58895985c1849992336c219b";
+    Todos todo = db.getTodo(id);
+    when(ctx.pathParam("id")).thenReturn(id);
+    todosController.getTodo(ctx);
+
+    verify(ctx).json(todo);
+    verify(ctx).status(HttpStatus.OK);
+  }
 }
