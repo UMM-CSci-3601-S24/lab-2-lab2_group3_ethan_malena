@@ -9,6 +9,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.javalin.http.BadRequestResponse;
+
 //import io.javalin.http.BadRequestResponse;
 
 public class TodosDatabase {
@@ -44,6 +46,22 @@ public class TodosDatabase {
   public Todos[] listTodos(Map<String, List<String>> queryParams) {
     Todos[] filteredTodos = allTodos;
 
+    if (queryParams.containsKey("status")) {
+      String statusParam = queryParams.get("status").get(0);
+      try {
+        String targetStatus = null;
+        if(statusParam == "true"){
+          targetStatus = "complete";
+        }
+        if(statusParam == "false"){
+          targetStatus = "incomplete";
+        }
+        filteredTodos = filterTodosByStatus(filteredTodos, targetStatus);
+      } catch (NumberFormatException e) {
+        throw new BadRequestResponse("Specified age '" + statusParam + "' can't be parsed to an integer");
+      }
+    }
+
     if (queryParams.containsKey("owner")) {
       String targetOwner = queryParams.get("owner").get(0);
       filteredTodos = filterTodosByOwner(filteredTodos, targetOwner);
@@ -60,6 +78,10 @@ public class TodosDatabase {
    */
   public Todos[] filterTodosByOwner(Todos[] todos, String targetOwner) {
     return Arrays.stream(todos).filter(x -> x.owner.equals(targetOwner)).toArray(Todos[]::new);
+  }
+
+  public Todos[] filterTodosByStatus(Todos[] todos, String targetStatus) {
+    return Arrays.stream(todos).filter(x -> x.status.equals(targetStatus)).toArray(Todos[]::new);
   }
 
 }
