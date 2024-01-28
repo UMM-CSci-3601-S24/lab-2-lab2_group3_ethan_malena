@@ -1,9 +1,10 @@
 package umm3601.todos;
 
-//import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 //import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 //import java.util.Arrays;
@@ -11,7 +12,7 @@ import java.io.IOException;
 //import java.util.List;
 //import java.util.Map;
 
-//import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -23,6 +24,7 @@ import org.mockito.MockitoAnnotations;
 import io.javalin.Javalin;
 //import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
+import io.javalin.http.NotFoundResponse;
 //import io.javalin.http.HttpStatus;
 //import io.javalin.http.NotFoundResponse;
 import umm3601.Main;
@@ -58,6 +60,35 @@ public class TodoControllerSpec {
     Javalin mockServer = Mockito.mock(Javalin.class);
     controller.addRoutes(mockServer);
     verify(mockServer, Mockito.atLeast(2)).get(any(), any());
+  }
+
+  @Test
+  public void buildControllerFailsWithIllegalDbFile() {
+    Assertions.assertThrows(IOException.class, () -> {
+      TodosController.buildTodosController("this is not a legal file name");
+    });
+  }
+
+  /**
+   * @throws IOException if there are any problems reading from the database file.
+   */
+  @Test
+  public void canGetAllTodos() throws IOException {
+    todosController.getTodos(ctx);
+    verify(ctx).json(todoArrayCaptor.capture());
+    assertEquals(db.size(), todoArrayCaptor.getValue().length);
+  }
+
+  /**
+   * @throws IOException if there are any problems reading the db file.
+   */
+  @Test
+  public void respondsAppropriatelyToRequestForNonexistentId() throws IOException {
+    when(ctx.pathParam("id")).thenReturn(null);
+    Throwable exception = Assertions.assertThrows(NotFoundResponse.class, () -> {
+      todosController.getTodo(ctx);
+    });
+    assertEquals("No todos with id " + null + " was found.", exception.getMessage());
   }
 
 }
