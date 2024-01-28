@@ -60,6 +60,7 @@ public class TodosController implements Controller {
   public void addRoutes(Javalin server) {
     server.get("/api/todos/{id}", this::getTodos);
     server.get("/api/todos", this::getTodos);
-    server.get("/api/todos/58895985c1849992336c219b", this::getTodos);
+
+    //server.get("/api/todos/58895985c1849992336c219b", this::getTodos);
   }
 }
