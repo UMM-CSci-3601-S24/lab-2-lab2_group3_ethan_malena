@@ -3,6 +3,7 @@ package umm3601.todos;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,26 @@ public class TodosDatabase {
    */
   public Todos[] listTodos(Map<String, List<String>> queryParams) {
     Todos[] filteredTodos = allTodos;
+/*
+    if(queryParams.containsKey("limit")) {
+      String limitParam = queryParams.get("limit").get(0);
+      try {
+        int targetLimit = Integer.parseInt(limitParam);
+        filteredTodos = new Todos[targetLimit];
+      } catch (NumberFormatException e) {
+        throw new BadRequestResponse("Specified limit '" + limitParam + "' can't be parsed to an integer");
+      }
+    }
+*/
+    if (queryParams.containsKey("limit")) {
+      String limitParam = queryParams.get("limit").get(0);
+      try {
+        int targetLimit = Integer.parseInt(limitParam);
+        filteredTodos = Arrays.copyOfRange(filteredTodos, 0, targetLimit);
+        } catch (NumberFormatException e) {
+          throw new BadRequestResponse("Specified limit '" + limitParam + "' can't be parsed to an integer");
+      }
+    }
 
     if (queryParams.containsKey("status")) {
       String statusParam = queryParams.get("status").get(0);

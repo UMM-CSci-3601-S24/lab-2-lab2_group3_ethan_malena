@@ -149,4 +149,21 @@ public class TodoControllerSpec {
     assertEquals(27, todoArrayCaptor.getValue().length);
   }
 
+  @Test
+  public void canGetTodosWithGivenLimitStatusAndOwner() throws IOException {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("owner", Arrays.asList(new String[] {"Fry"}));
+    queryParams.put("status", Arrays.asList(new String[] {"complete"}));
+    queryParams.put("limit", Arrays.asList(new String[] {"7"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+
+    todosController.getTodos(ctx);
+    verify(ctx).json(todoArrayCaptor.capture());
+    for (Todos todos : todoArrayCaptor.getValue()) {
+      assertEquals(true, todos.status);
+      assertEquals("Fry", todos.owner);
+    }
+    assertEquals(1, todoArrayCaptor.getValue().length);
+  }
+
 }
