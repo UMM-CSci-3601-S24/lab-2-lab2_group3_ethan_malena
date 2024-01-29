@@ -11,6 +11,10 @@ import java.io.IOException;
 //import java.util.HashMap;
 //import java.util.List;
 //import java.util.Map;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -102,4 +106,31 @@ public class TodoControllerSpec {
     verify(ctx).json(todo);
     verify(ctx).status(HttpStatus.OK);
   }
+
+  @Test
+  public void canGetUsersWithStatusCompete() throws IOException {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("status", Arrays.asList(new String[] {"complete"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    todosController.getTodos(ctx);
+    verify(ctx).json(todoArrayCaptor.capture());
+    for (Todos todos : todoArrayCaptor.getValue()) {
+      assertEquals(true, todos.status);
+    }
+    assertEquals(143, todoArrayCaptor.getValue().length);
+  }
+
+  @Test
+  public void canGetTodosWithOwner() throws IOException {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("owner", Arrays.asList(new String[] {"Fry"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    todosController.getTodos(ctx);
+    verify(ctx).json(todoArrayCaptor.capture());
+    for (Todos todos : todoArrayCaptor.getValue()) {
+      assertEquals("Fry", todos.owner);
+    }
+    assertEquals(61, todoArrayCaptor.getValue().length);
+  }
+
 }

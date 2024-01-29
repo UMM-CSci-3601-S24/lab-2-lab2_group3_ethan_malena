@@ -49,16 +49,16 @@ public class TodosDatabase {
     if (queryParams.containsKey("status")) {
       String statusParam = queryParams.get("status").get(0);
       try {
-        String targetStatus = null;
-        if(statusParam == "true"){
-          targetStatus = "complete";
+        Boolean targetStatus = null;
+        if (statusParam == "complete") {
+          targetStatus = true;
         }
-        if(statusParam == "false"){
-          targetStatus = "incomplete";
+        if (statusParam == "incomplete") {
+          targetStatus = false;
         }
         filteredTodos = filterTodosByStatus(filteredTodos, targetStatus);
       } catch (NumberFormatException e) {
-        throw new BadRequestResponse("Specified age '" + statusParam + "' can't be parsed to an integer");
+        throw new BadRequestResponse("Specified status '" + statusParam + "' is not complete or incomplete");
       }
     }
 
@@ -80,7 +80,7 @@ public class TodosDatabase {
     return Arrays.stream(todos).filter(x -> x.owner.equals(targetOwner)).toArray(Todos[]::new);
   }
 
-  public Todos[] filterTodosByStatus(Todos[] todos, String targetStatus) {
+  public Todos[] filterTodosByStatus(Todos[] todos, Boolean targetStatus) {
     return Arrays.stream(todos).filter(x -> x.status.equals(targetStatus)).toArray(Todos[]::new);
   }
 
