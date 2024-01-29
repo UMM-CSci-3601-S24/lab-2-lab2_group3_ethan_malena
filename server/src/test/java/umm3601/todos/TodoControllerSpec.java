@@ -138,6 +138,7 @@ public class TodoControllerSpec {
     Map<String, List<String>> queryParams = new HashMap<>();
     queryParams.put("owner", Arrays.asList(new String[] {"Fry"}));
     queryParams.put("status", Arrays.asList(new String[] {"complete"}));
+    queryParams.put("limit", Arrays.asList(new Int[] {4}));
     when(ctx.queryParamMap()).thenReturn(queryParams);
 
     todosController.getTodos(ctx);
@@ -146,7 +147,7 @@ public class TodoControllerSpec {
       assertEquals(true, todos.status);
       assertEquals("Fry", todos.owner);
     }
-    assertEquals(27, todoArrayCaptor.getValue().length);
+    assertEquals(4, todoArrayCaptor.getValue().length);
   }
 
 }

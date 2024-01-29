@@ -67,6 +67,11 @@ public class TodosDatabase {
       filteredTodos = filterTodosByOwner(filteredTodos, targetOwner);
     }
 
+    if (queryParams.containsKey("limit")) {
+      Int targetLimit = queryParams.get("limit").get(0);
+      filteredTodos = filterTodosByLimit(filteredTodos, targetLimit);
+    }
+
     return filteredTodos;
   }
 
@@ -82,6 +87,10 @@ public class TodosDatabase {
 
   public Todos[] filterTodosByStatus(Todos[] todos, Boolean targetStatus) {
     return Arrays.stream(todos).filter(x -> x.status.equals(targetStatus)).toArray(Todos[]::new);
+  }
+
+  public Todos[] filterTodosByLimit(Todos[] todos, Int targetLimit) {
+    return Arrays.stream(todos).filter(x -> x.limit.equals(targetLimit)).toArray(Todos[]::new);
   }
 
 }
