@@ -69,8 +69,12 @@ public class TodosDatabase {
 
     if (queryParams.containsKey("orderBy")) {
       String targetOrder = queryParams.get("orderBy").get(0);
-        filteredTodos = Arrays.sort(filteredTodos, targetOrder));
+        filteredTodos = Arrays.sort(filteredTodos, targetOrder);
       }
+
+    //Malena: In all honesty, I am just stuck here. My idea was to sort the
+    //array by the targetOrder, but I think I went about it wrong and now
+    // I am stuck.
 
     return filteredTodos;
   }
@@ -87,10 +91,6 @@ public class TodosDatabase {
 
   public Todos[] filterTodosByStatus(Todos[] todos, Boolean targetStatus) {
     return Arrays.stream(todos).filter(x -> x.status.equals(targetStatus)).toArray(Todos[]::new);
-  }
-
-  public Todos[] filterTodosByOrder(Todos[] todos, String targetOrder) {
-    return Arrays.stream(todos).filter(x -> x.targetOrder.equals(targetOrder)).toArray(Todos[]::new);
   }
 
 }
