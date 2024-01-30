@@ -67,6 +67,18 @@ public class TodosDatabase {
       filteredTodos = filterTodosByOwner(filteredTodos, targetOwner);
     }
 
+    if (queryParams.containsKey("contains")) {
+      String containsParam = queryParams.get("contains").get(0);
+      String targetContains =
+      if (containsParam == "complete") {
+        targetContains = true;
+      }
+      if (containsParam == "incomplete") {
+        targetStatus = false;
+      }
+      filteredTodos = filterTodosByContains(filteredTodos, targetContains);
+    }
+
     return filteredTodos;
   }
 
@@ -82,6 +94,10 @@ public class TodosDatabase {
 
   public Todos[] filterTodosByStatus(Todos[] todos, Boolean targetStatus) {
     return Arrays.stream(todos).filter(x -> x.status.equals(targetStatus)).toArray(Todos[]::new);
+  }
+
+  public Todos[] filterTodosByContains(Todos[] todos, String targetContains) {
+    return Arrays.stream(todos).filter(x -> x.body.equals(targetContains)).toArray(Todos[]::new);
   }
 
 }
