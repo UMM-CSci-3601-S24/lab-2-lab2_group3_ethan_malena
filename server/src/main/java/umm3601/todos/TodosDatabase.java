@@ -46,17 +46,7 @@ public class TodosDatabase {
    */
   public Todos[] listTodos(Map<String, List<String>> queryParams) {
     Todos[] filteredTodos = allTodos;
-/*
-    if(queryParams.containsKey("limit")) {
-      String limitParam = queryParams.get("limit").get(0);
-      try {
-        int targetLimit = Integer.parseInt(limitParam);
-        filteredTodos = new Todos[targetLimit];
-      } catch (NumberFormatException e) {
-        throw new BadRequestResponse("Specified limit '" + limitParam + "' can't be parsed to an integer");
-      }
-    }
-*/
+
     if (queryParams.containsKey("limit")) {
       String limitParam = queryParams.get("limit").get(0);
       try {
@@ -66,6 +56,10 @@ public class TodosDatabase {
           throw new BadRequestResponse("Specified limit '" + limitParam + "' can't be parsed to an integer");
       }
     }
+    // Malena: The issue with this implementation is that instead of
+    // returning 7 that matched, it is returning the amount that matched
+    // in the first 7 entries in the json file. I am not sure how
+    // to fix that.
 
     if (queryParams.containsKey("status")) {
       String statusParam = queryParams.get("status").get(0);
