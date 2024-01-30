@@ -70,14 +70,14 @@ public class TodosDatabase {
     if (queryParams.containsKey("contains")) {
       String containsParam = queryParams.get("contains").get(0);
       String targetContains =
-      if (containsParam == "complete") {
-        targetContains = true;
-      }
-      if (containsParam == "incomplete") {
-        targetStatus = false;
-      }
       filteredTodos = filterTodosByContains(filteredTodos, targetContains);
     }
+
+    // Malena: I tried many different things for this one so the
+    // code is not really complete as I ran out of ideas. I wanted
+    // the right if statements about if the containsParam could be
+    // found in the body of the todos from the database, however,
+    // I was not sure if there was a built in function for that or not.
 
     return filteredTodos;
   }
