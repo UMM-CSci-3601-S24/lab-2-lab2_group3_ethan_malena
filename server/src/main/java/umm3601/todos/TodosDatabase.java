@@ -68,27 +68,9 @@ public class TodosDatabase {
     }
 
     if (queryParams.containsKey("orderBy")) {
-      String orderParam = queryParams.get("orderBy").get(0);
-      Arrays.sort(filteredTodos);
-      try {
-        String targetOrder = null;
-        if (orderParam == "category") {
-          targetOrder = "category";
-        }
-        if (orderParam == "owner") {
-          targetOrder = "owner";
-        }
-        if (orderParam == "body") {
-          targetOrder = "body";
-        }
-        if (orderParam == "status") {
-          targetOrder = "status";
-        }
-        filteredTodos = Arrays.sort(filteredTodos, queryParams.get(targetOrder));
-      } catch (NumberFormatException e) {
-        throw new BadRequestResponse("Specified status '" + statusParam + "' is not complete or incomplete");
+      String targetOrder = queryParams.get("orderBy").get(0);
+        filteredTodos = Arrays.sort(filteredTodos, targetOrder));
       }
-    }
 
     return filteredTodos;
   }
@@ -108,7 +90,7 @@ public class TodosDatabase {
   }
 
   public Todos[] filterTodosByOrder(Todos[] todos, String targetOrder) {
-    return Arrays.stream(todos).filter(x -> x.orderBy.equals(targetOrder)).toArray(Todos[]::new);
+    return Arrays.stream(todos).filter(x -> x.targetOrder.equals(targetOrder)).toArray(Todos[]::new);
   }
 
 }
