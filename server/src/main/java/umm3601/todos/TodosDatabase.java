@@ -47,15 +47,7 @@ public class TodosDatabase {
   public Todos[] listTodos(Map<String, List<String>> queryParams) {
     Todos[] filteredTodos = allTodos;
 
-    if (queryParams.containsKey("limit")) {
-      String limitParam = queryParams.get("limit").get(0);
-      try {
-        int targetLimit = Integer.parseInt(limitParam);
-        filteredTodos = Arrays.copyOfRange(filteredTodos, 0, targetLimit);
-        } catch (NumberFormatException e) {
-          throw new BadRequestResponse("Specified limit '" + limitParam + "' can't be parsed to an integer");
-      }
-    }
+
     // Malena: The issue with this implementation is that instead of
     // returning 7 that matched, it is returning the amount that matched
     // in the first 7 entries in the json file. I am not sure how
@@ -67,9 +59,10 @@ public class TodosDatabase {
         Boolean targetStatus = null;
         if (statusParam == "complete") {
           targetStatus = true;
-        }
-        if (statusParam == "incomplete") {
+        } else if (statusParam == "incomplete") {
           targetStatus = false;
+        } else {
+          throw new BadRequestResponse("...");
         }
         filteredTodos = filterTodosByStatus(filteredTodos, targetStatus);
       } catch (NumberFormatException e) {
@@ -80,6 +73,16 @@ public class TodosDatabase {
     if (queryParams.containsKey("owner")) {
       String targetOwner = queryParams.get("owner").get(0);
       filteredTodos = filterTodosByOwner(filteredTodos, targetOwner);
+    }
+
+    if (queryParams.containsKey("limit")) {
+      String limitParam = queryParams.get("limit").get(0);
+      try {
+        int targetLimit = Integer.parseInt(limitParam);
+        filteredTodos = Arrays.copyOfRange(filteredTodos, 0, targetLimit);
+        } catch (NumberFormatException e) {
+          throw new BadRequestResponse("Specified limit '" + limitParam + "' can't be parsed to an integer");
+      }
     }
 
     return filteredTodos;
