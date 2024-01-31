@@ -47,27 +47,17 @@ public class TodosDatabase {
   public Todos[] listTodos(Map<String, List<String>> queryParams) {
     Todos[] filteredTodos = allTodos;
 
-
-    // Malena: The issue with this implementation is that instead of
-    // returning 7 that matched, it is returning the amount that matched
-    // in the first 7 entries in the json file. I am not sure how
-    // to fix that.
-
     if (queryParams.containsKey("status")) {
       String statusParam = queryParams.get("status").get(0);
-      try {
         Boolean targetStatus = null;
         if (statusParam == "complete") {
           targetStatus = true;
         } else if (statusParam == "incomplete") {
           targetStatus = false;
         } else {
-          throw new BadRequestResponse("...");
+          throw new BadRequestResponse("Specified status '" + statusParam + "' must be complete or incomplete");
         }
         filteredTodos = filterTodosByStatus(filteredTodos, targetStatus);
-      } catch (NumberFormatException e) {
-        throw new BadRequestResponse("Specified status '" + statusParam + "' is not complete or incomplete");
-      }
     }
 
     if (queryParams.containsKey("owner")) {
@@ -78,7 +68,8 @@ public class TodosDatabase {
     if (queryParams.containsKey("limit")) {
       String limitParam = queryParams.get("limit").get(0);
       try {
-        int targetLimit = Integer.parseInt(limitParam);
+        int targetLim = Integer.parseInt(limitParam);
+        int targetLimit = Integer.min(targetLim, filteredTodos.length);
         filteredTodos = Arrays.copyOfRange(filteredTodos, 0, targetLimit);
         } catch (NumberFormatException e) {
           throw new BadRequestResponse("Specified limit '" + limitParam + "' can't be parsed to an integer");
