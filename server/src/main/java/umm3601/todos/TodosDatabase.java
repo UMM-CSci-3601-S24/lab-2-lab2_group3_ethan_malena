@@ -3,6 +3,7 @@ package umm3601.todos;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+//import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -48,23 +49,31 @@ public class TodosDatabase {
 
     if (queryParams.containsKey("status")) {
       String statusParam = queryParams.get("status").get(0);
-      try {
         Boolean targetStatus = null;
         if (statusParam == "complete") {
           targetStatus = true;
-        }
-        if (statusParam == "incomplete") {
+        } else if (statusParam == "incomplete") {
           targetStatus = false;
+        } else {
+          throw new BadRequestResponse("Specified status '" + statusParam + "' must be complete or incomplete");
         }
         filteredTodos = filterTodosByStatus(filteredTodos, targetStatus);
-      } catch (NumberFormatException e) {
-        throw new BadRequestResponse("Specified status '" + statusParam + "' is not complete or incomplete");
-      }
     }
 
     if (queryParams.containsKey("owner")) {
       String targetOwner = queryParams.get("owner").get(0);
       filteredTodos = filterTodosByOwner(filteredTodos, targetOwner);
+    }
+
+    if (queryParams.containsKey("limit")) {
+      String limitParam = queryParams.get("limit").get(0);
+      try {
+        int targetLim = Integer.parseInt(limitParam);
+        int targetLimit = Integer.min(targetLim, filteredTodos.length);
+        filteredTodos = Arrays.copyOfRange(filteredTodos, 0, targetLimit);
+        } catch (NumberFormatException e) {
+          throw new BadRequestResponse("Specified limit '" + limitParam + "' can't be parsed to an integer");
+      }
     }
 
     if (queryParams.containsKey("category")) {
