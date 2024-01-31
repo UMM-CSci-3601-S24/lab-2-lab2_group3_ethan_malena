@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +70,7 @@ public class TodosDatabase {
 
     if (queryParams.containsKey("orderBy")) {
       String targetOrder = queryParams.get("orderBy").get(0);
-        filteredTodos = Arrays.sort(filteredTodos, targetOrder);
+        Arrays.sort(filteredTodos, Comparator.comparing((todo) -> todo.status));
       }
 
     //Malena: In all honesty, I am just stuck here. My idea was to sort the
