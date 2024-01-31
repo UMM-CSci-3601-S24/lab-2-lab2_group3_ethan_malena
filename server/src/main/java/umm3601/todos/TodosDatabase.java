@@ -51,10 +51,10 @@ public class TodosDatabase {
       String statusParam = queryParams.get("status").get(0);
       try {
         Boolean targetStatus = null;
-        if (statusParam == "complete") {
+        if (statusParam.equals("complete")) {
           targetStatus = true;
         }
-        if (statusParam == "incomplete") {
+        if (statusParam.equals("incomplete")) {
           targetStatus = false;
         }
         filteredTodos = filterTodosByStatus(filteredTodos, targetStatus);
