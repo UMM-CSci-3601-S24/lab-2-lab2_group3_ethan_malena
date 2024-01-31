@@ -134,6 +134,19 @@ public class TodoControllerSpec {
   }
 
   @Test
+  public void canGetTodosWithCategory() throws IOException {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("category", Arrays.asList(new String[] {"groceries"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    todosController.getTodos(ctx);
+    verify(ctx).json(todoArrayCaptor.capture());
+    for (Todos todos : todoArrayCaptor.getValue()) {
+      assertEquals("groceries", todos.category);
+    }
+    assertEquals(76, todoArrayCaptor.getValue().length);
+  }
+
+  @Test
   public void canGetTodosWithGivenStatusAndOwner() throws IOException {
     Map<String, List<String>> queryParams = new HashMap<>();
     queryParams.put("owner", Arrays.asList(new String[] {"Fry"}));

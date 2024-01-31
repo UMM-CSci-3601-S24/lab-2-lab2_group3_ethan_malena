@@ -76,6 +76,11 @@ public class TodosDatabase {
       }
     }
 
+    if (queryParams.containsKey("category")) {
+      String targetCategory = queryParams.get("category").get(0);
+      filteredTodos = filterTodosByCategory(filteredTodos, targetCategory);
+    }
+
     return filteredTodos;
   }
 
@@ -91,6 +96,10 @@ public class TodosDatabase {
 
   public Todos[] filterTodosByStatus(Todos[] todos, Boolean targetStatus) {
     return Arrays.stream(todos).filter(x -> x.status.equals(targetStatus)).toArray(Todos[]::new);
+  }
+
+  public Todos[] filterTodosByCategory(Todos[] todos, String targetCategory) {
+    return Arrays.stream(todos).filter(x -> x.category.equals(targetCategory)).toArray(Todos[]::new);
   }
 
 }
