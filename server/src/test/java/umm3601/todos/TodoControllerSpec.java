@@ -1,6 +1,7 @@
 package umm3601.todos;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 //import static org.mockito.Mockito.when;
@@ -134,6 +135,19 @@ public class TodoControllerSpec {
   }
 
   @Test
+  public void canGetTodosWithCategory() throws IOException {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("category", Arrays.asList(new String[] {"groceries"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    todosController.getTodos(ctx);
+    verify(ctx).json(todoArrayCaptor.capture());
+    for (Todos todos : todoArrayCaptor.getValue()) {
+      assertEquals("groceries", todos.category);
+    }
+    assertEquals(76, todoArrayCaptor.getValue().length);
+  }
+
+  @Test
   public void canGetTodosWithGivenStatusAndOwner() throws IOException {
     Map<String, List<String>> queryParams = new HashMap<>();
     queryParams.put("owner", Arrays.asList(new String[] {"Fry"}));
@@ -149,4 +163,57 @@ public class TodoControllerSpec {
     assertEquals(27, todoArrayCaptor.getValue().length);
   }
 
+  @Test
+  public void canGetTodosWithGivenStatusOrderByAndOwner() throws IOException {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("owner", Arrays.asList(new String[] {"Fry"}));
+    queryParams.put("status", Arrays.asList(new String[] {"complete"}));
+    queryParams.put("orderBy", Arrays.asList(new String[] {"category"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+
+    todosController.getTodos(ctx);
+    verify(ctx).json(todoArrayCaptor.capture());
+    for (Todos todos : todoArrayCaptor.getValue()) {
+      assertEquals(true, todos.status);
+      assertEquals("Fry", todos.owner);
+    }
+
+    Todos[] todos = todoArrayCaptor.getValue();
+    for (int i = 0; i < todos.length - 1; i++) {
+    assertTrue(todos[i].category.compareTo(todos[i + 1].category) <= 0);
+    }
+  }
+  @Test
+  public void canGetTodosWithGivenLimitStatusAndOwner() throws IOException {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("owner", Arrays.asList(new String[] {"Fry"}));
+    queryParams.put("status", Arrays.asList(new String[] {"complete"}));
+    queryParams.put("limit", Arrays.asList(new String[] {"7"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+
+    todosController.getTodos(ctx);
+    verify(ctx).json(todoArrayCaptor.capture());
+    for (Todos todos : todoArrayCaptor.getValue()) {
+      assertEquals(true, todos.status);
+      assertEquals("Fry", todos.owner);
+    }
+    assertEquals(7, todoArrayCaptor.getValue().length);
+  }
+
+  @Test
+  public void canGetTodosWithLimit() throws IOException {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("owner", Arrays.asList(new String[] {"Fry"}));
+    queryParams.put("status", Arrays.asList(new String[] {"complete"}));
+    queryParams.put("limit", Arrays.asList(new String[] {"100"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+
+    todosController.getTodos(ctx);
+    verify(ctx).json(todoArrayCaptor.capture());
+    for (Todos todos : todoArrayCaptor.getValue()) {
+      assertEquals(true, todos.status);
+      assertEquals("Fry", todos.owner);
+    }
+    assertEquals(27, todoArrayCaptor.getValue().length);
+  }
 }
