@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 //import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -50,9 +51,9 @@ public class TodosDatabase {
     if (queryParams.containsKey("status")) {
       String statusParam = queryParams.get("status").get(0);
         Boolean targetStatus = null;
-        if (statusParam == "complete") {
+        if (statusParam.equals("complete")) {
           targetStatus = true;
-        } else if (statusParam == "incomplete") {
+        } else if (statusParam.equals("incomplete")) {
           targetStatus = false;
         } else {
           throw new BadRequestResponse("Specified status '" + statusParam + "' must be complete or incomplete");
@@ -65,6 +66,27 @@ public class TodosDatabase {
       filteredTodos = filterTodosByOwner(filteredTodos, targetOwner);
     }
 
+    if (queryParams.containsKey("orderBy")) {
+      String targetOrder = queryParams.get("orderBy").get(0);
+      if (targetOrder == "status") {
+        Arrays.sort(filteredTodos, Comparator.comparing((todo) -> todo.status));
+      } else if (targetOrder == "owner") {
+        Arrays.sort(filteredTodos, Comparator.comparing((todo) -> todo.owner));
+      } else if (targetOrder == "body") {
+        Arrays.sort(filteredTodos, Comparator.comparing((todo) -> todo.body));
+      } else if (targetOrder == "category") {
+        Arrays.sort(filteredTodos, Comparator.comparing((todo) -> todo.category));
+      } else {
+        throw new BadRequestResponse("Specified orderBy parameter '" + targetOrder
+        + "' must be status, owner, body, or category");
+      }
+    }
+
+    if (queryParams.containsKey("category")) {
+      String targetCategory = queryParams.get("category").get(0);
+      filteredTodos = filterTodosByCategory(filteredTodos, targetCategory);
+    }
+
     if (queryParams.containsKey("limit")) {
       String limitParam = queryParams.get("limit").get(0);
       try {
@@ -74,11 +96,6 @@ public class TodosDatabase {
         } catch (NumberFormatException e) {
           throw new BadRequestResponse("Specified limit '" + limitParam + "' can't be parsed to an integer");
       }
-    }
-
-    if (queryParams.containsKey("category")) {
-      String targetCategory = queryParams.get("category").get(0);
-      filteredTodos = filterTodosByCategory(filteredTodos, targetCategory);
     }
 
     return filteredTodos;
