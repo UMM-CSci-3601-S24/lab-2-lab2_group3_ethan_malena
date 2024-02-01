@@ -1,6 +1,7 @@
 package umm3601.todos;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 //import static org.mockito.Mockito.when;
@@ -165,8 +166,9 @@ public class TodoControllerSpec {
     }
 
     Todos[] todos = todoArrayCaptor.getValue();
-    for(i = 0; i < todos.length; i++)
-    assertTrue(todos[i].category.compareTo(todos[i].category)<=0);
+    for(int i = 0; i < todos.length - 1; i++){
+    assertTrue(todos[i].category.compareTo(todos[i+1].category)<=0);
+    }
   }
 
 }
