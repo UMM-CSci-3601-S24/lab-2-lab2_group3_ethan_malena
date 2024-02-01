@@ -165,8 +165,8 @@ public class TodoControllerSpec {
     }
 
     Todos[] todos = todoArrayCaptor.getValue();
-    for(i = 0; )
-    assertTrue()
+    for(i = 0; i < todos.length; i++)
+    assertTrue(todos[i].category.compareTo(todos[i].category)<=0);
   }
 
 }
