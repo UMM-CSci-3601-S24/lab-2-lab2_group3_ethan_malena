@@ -170,5 +170,4 @@ public class TodoControllerSpec {
     assertTrue(todos[i].category.compareTo(todos[i+1].category)<=0);
     }
   }
-
 }
