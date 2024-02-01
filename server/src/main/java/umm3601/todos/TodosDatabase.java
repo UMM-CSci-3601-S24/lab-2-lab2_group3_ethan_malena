@@ -70,18 +70,19 @@ public class TodosDatabase {
 
     if (queryParams.containsKey("orderBy")) {
       String targetOrder = queryParams.get("orderBy").get(0);
-      if(targetOrder == "status"){
+      if (targetOrder == "status") {
         Arrays.sort(filteredTodos, Comparator.comparing((todo) -> todo.status));
-      } else if (targetOrder == "owner"){
+      } else if (targetOrder == "owner") {
         Arrays.sort(filteredTodos, Comparator.comparing((todo) -> todo.owner));
-      } else if (targetOrder == "body"){
+      } else if (targetOrder == "body") {
         Arrays.sort(filteredTodos, Comparator.comparing((todo) -> todo.body));
-      } else if (targetOrder == "category"){
+      } else if (targetOrder == "category") {
         Arrays.sort(filteredTodos, Comparator.comparing((todo) -> todo.category));
-      } else{
-        throw new BadRequestResponse("Specified orderBy parameter '" + targetOrder + "' must be status, owner, body, or category");
+      } else {
+        throw new BadRequestResponse("Specified orderBy parameter '" + targetOrder
+        + "' must be status, owner, body, or category");
       }
-      }
+    }
 
     return filteredTodos;
   }
