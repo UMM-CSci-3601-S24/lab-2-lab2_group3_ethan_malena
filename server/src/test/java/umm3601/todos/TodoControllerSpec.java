@@ -27,6 +27,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import io.javalin.Javalin;
+import io.javalin.http.BadRequestResponse;
 //import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
@@ -284,5 +285,39 @@ public class TodoControllerSpec {
     assertTrue(todos[i].body.compareTo(todos[i + 1].body) <= 0);
     }
   }
+
+  @Test
+  public void respondsAppropriatelyToIllegalAge() {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("limit", Arrays.asList(new String[] {"mno"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    Throwable exception = Assertions.assertThrows(BadRequestResponse.class, () -> {
+      todosController.getTodos(ctx);
+    });
+    assertEquals("Specified limit 'mno' can't be parsed to an integer", exception.getMessage());
+  }
+
+  @Test
+  public void respondsAppropriatelyToIllegalStatus() {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("status", Arrays.asList(new String[] {"mno"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    Throwable exception = Assertions.assertThrows(BadRequestResponse.class, () -> {
+      todosController.getTodos(ctx);
+    });
+    assertEquals("Specified status 'mno' must be complete or incomplete", exception.getMessage());
+  }
+
+  @Test
+  public void respondsAppropriatelyToIllegalOrderBy() {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("orderBy", Arrays.asList(new String[] {"17"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    Throwable exception = Assertions.assertThrows(BadRequestResponse.class, () -> {
+      todosController.getTodos(ctx);
+    });
+    assertEquals("Specified orderBy parameter '17' must be status, owner, body, or category", exception.getMessage());
+  }
+
 
 }
