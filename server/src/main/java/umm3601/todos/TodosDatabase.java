@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 //import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -50,9 +51,9 @@ public class TodosDatabase {
     if (queryParams.containsKey("status")) {
       String statusParam = queryParams.get("status").get(0);
         Boolean targetStatus = null;
-        if (statusParam == "complete") {
+        if (statusParam.equals("complete")) {
           targetStatus = true;
-        } else if (statusParam == "incomplete") {
+        } else if (statusParam.equals("incomplete")) {
           targetStatus = false;
         } else {
           throw new BadRequestResponse("Specified status '" + statusParam + "' must be complete or incomplete");
@@ -63,6 +64,33 @@ public class TodosDatabase {
     if (queryParams.containsKey("owner")) {
       String targetOwner = queryParams.get("owner").get(0);
       filteredTodos = filterTodosByOwner(filteredTodos, targetOwner);
+    }
+
+    if (queryParams.containsKey("orderBy")) {
+      String targetOrder = queryParams.get("orderBy").get(0);
+      if (targetOrder.equals("status")) {
+        Arrays.sort(filteredTodos, Comparator.comparing((todo) -> todo.status));
+      } else if (targetOrder.equals("owner")) {
+        Arrays.sort(filteredTodos, Comparator.comparing((todo) -> todo.owner));
+      } else if (targetOrder.equals("body")) {
+        Arrays.sort(filteredTodos, Comparator.comparing((todo) -> todo.body));
+      } else if (targetOrder.equals("category")) {
+        Arrays.sort(filteredTodos, Comparator.comparing((todo) -> todo.category));
+      } else {
+        throw new BadRequestResponse("Specified orderBy parameter '" + targetOrder
+        + "' must be status, owner, body, or category");
+      }
+    }
+
+    if (queryParams.containsKey("category")) {
+      String targetCategory = queryParams.get("category").get(0);
+      filteredTodos = filterTodosByCategory(filteredTodos, targetCategory);
+    }
+
+
+    if (queryParams.containsKey("contains")) {
+      String targetContains = queryParams.get("contains").get(0);
+      filteredTodos = filterTodosByContains(filteredTodos, targetContains);
     }
 
     if (queryParams.containsKey("limit")) {
@@ -76,10 +104,6 @@ public class TodosDatabase {
       }
     }
 
-    if (queryParams.containsKey("category")) {
-      String targetCategory = queryParams.get("category").get(0);
-      filteredTodos = filterTodosByCategory(filteredTodos, targetCategory);
-    }
 
     return filteredTodos;
   }
@@ -100,6 +124,10 @@ public class TodosDatabase {
 
   public Todos[] filterTodosByCategory(Todos[] todos, String targetCategory) {
     return Arrays.stream(todos).filter(x -> x.category.equals(targetCategory)).toArray(Todos[]::new);
+  }
+
+  public Todos[] filterTodosByContains(Todos[] todos, String targetContains) {
+    return Arrays.stream(todos).filter(x -> x.body.contains(targetContains)).toArray(Todos[]::new);
   }
 
 }

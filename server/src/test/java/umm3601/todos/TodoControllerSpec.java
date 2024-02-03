@@ -1,6 +1,7 @@
 package umm3601.todos;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 //import static org.mockito.Mockito.when;
@@ -26,6 +27,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import io.javalin.Javalin;
+import io.javalin.http.BadRequestResponse;
 //import io.javalin.http.BadRequestResponse;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
@@ -163,17 +165,37 @@ public class TodoControllerSpec {
   }
 
   @Test
-  public void canGetTodosWithGivenLimitStatusAndOwner() throws IOException {
+  public void canGetTodosWithGivenStatusOrderByAndOwner() throws IOException {
     Map<String, List<String>> queryParams = new HashMap<>();
     queryParams.put("owner", Arrays.asList(new String[] {"Fry"}));
     queryParams.put("status", Arrays.asList(new String[] {"complete"}));
-    queryParams.put("limit", Arrays.asList(new String[] {"7"}));
+    queryParams.put("orderBy", Arrays.asList(new String[] {"category"}));
     when(ctx.queryParamMap()).thenReturn(queryParams);
 
     todosController.getTodos(ctx);
     verify(ctx).json(todoArrayCaptor.capture());
     for (Todos todos : todoArrayCaptor.getValue()) {
       assertEquals(true, todos.status);
+      assertEquals("Fry", todos.owner);
+    }
+
+    Todos[] todos = todoArrayCaptor.getValue();
+    for (int i = 0; i < todos.length - 1; i++) {
+    assertTrue(todos[i].category.compareTo(todos[i + 1].category) <= 0);
+    }
+  }
+  @Test
+  public void canGetTodosWithGivenLimitStatusAndOwner() throws IOException {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("owner", Arrays.asList(new String[] {"Fry"}));
+    queryParams.put("status", Arrays.asList(new String[] {"incomplete"}));
+    queryParams.put("limit", Arrays.asList(new String[] {"7"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+
+    todosController.getTodos(ctx);
+    verify(ctx).json(todoArrayCaptor.capture());
+    for (Todos todos : todoArrayCaptor.getValue()) {
+      assertEquals(false, todos.status);
       assertEquals("Fry", todos.owner);
     }
     assertEquals(7, todoArrayCaptor.getValue().length);
@@ -195,4 +217,107 @@ public class TodoControllerSpec {
     }
     assertEquals(27, todoArrayCaptor.getValue().length);
   }
+
+  @Test
+  public void canGetTodosWithContains() throws IOException {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("owner", Arrays.asList(new String[] {"Blanche"}));
+    queryParams.put("status", Arrays.asList(new String[] {"complete"}));
+    queryParams.put("limit", Arrays.asList(new String[] {"100"}));
+    queryParams.put("contains", Arrays.asList(new String[] {"sunt"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+
+    todosController.getTodos(ctx);
+    verify(ctx).json(todoArrayCaptor.capture());
+    for (Todos todos : todoArrayCaptor.getValue()) {
+      assertEquals(true, todos.status);
+      assertEquals("Blanche", todos.owner);
+      assertTrue(todos.body.contains("sunt"));
+    }
+    assertEquals(6, todoArrayCaptor.getValue().length);
+  }
+
+  @Test
+  public void canOrderByStatus() throws IOException {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("owner", Arrays.asList(new String[] {"Fry"}));
+    queryParams.put("status", Arrays.asList(new String[] {"incomplete"}));
+    queryParams.put("orderBy", Arrays.asList(new String[] {"status"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+
+    todosController.getTodos(ctx);
+    verify(ctx).json(todoArrayCaptor.capture());
+    for (Todos todos : todoArrayCaptor.getValue()) {
+      assertEquals(false, todos.status);
+      assertEquals("Fry", todos.owner);
+    }
+
+    Todos[] todos = todoArrayCaptor.getValue();
+    for (int i = 0; i < todos.length - 1; i++) {
+    assertTrue(todos[i].status.compareTo(todos[i + 1].status) <= 0);
+    }
+  }
+
+  @Test
+  public void canOrderByOwner() throws IOException {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("orderBy", Arrays.asList(new String[] {"owner"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    todosController.getTodos(ctx);
+    verify(ctx).json(todoArrayCaptor.capture());
+
+    Todos[] todos = todoArrayCaptor.getValue();
+    for (int i = 0; i < todos.length - 1; i++) {
+    assertTrue(todos[i].owner.compareTo(todos[i + 1].owner) <= 0);
+    }
+  }
+
+  @Test
+  public void canOrderByBody() throws IOException {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("orderBy", Arrays.asList(new String[] {"body"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    todosController.getTodos(ctx);
+    verify(ctx).json(todoArrayCaptor.capture());
+
+    Todos[] todos = todoArrayCaptor.getValue();
+    for (int i = 0; i < todos.length - 1; i++) {
+    assertTrue(todos[i].body.compareTo(todos[i + 1].body) <= 0);
+    }
+  }
+
+  @Test
+  public void respondsAppropriatelyToIllegalAge() {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("limit", Arrays.asList(new String[] {"mno"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    Throwable exception = Assertions.assertThrows(BadRequestResponse.class, () -> {
+      todosController.getTodos(ctx);
+    });
+    assertEquals("Specified limit 'mno' can't be parsed to an integer", exception.getMessage());
+  }
+
+  @Test
+  public void respondsAppropriatelyToIllegalStatus() {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("status", Arrays.asList(new String[] {"mno"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    Throwable exception = Assertions.assertThrows(BadRequestResponse.class, () -> {
+      todosController.getTodos(ctx);
+    });
+    assertEquals("Specified status 'mno' must be complete or incomplete", exception.getMessage());
+  }
+
+  @Test
+  public void respondsAppropriatelyToIllegalOrderBy() {
+    Map<String, List<String>> queryParams = new HashMap<>();
+    queryParams.put("orderBy", Arrays.asList(new String[] {"17"}));
+    when(ctx.queryParamMap()).thenReturn(queryParams);
+    Throwable exception = Assertions.assertThrows(BadRequestResponse.class, () -> {
+      todosController.getTodos(ctx);
+    });
+    assertEquals("Specified orderBy parameter '17' must be status, owner, body, or category", exception.getMessage());
+  }
+
+
 }
